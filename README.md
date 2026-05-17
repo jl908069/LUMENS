@@ -16,3 +16,6 @@ LUMENS/
     ├── fiction_002.tsv
     └── fiction_003.tsv
 ```
+
+## Export
+Please copy and paste the exported tsv file into any text editor. Name it as {book_id}.tsv (the same as your input tsv file name).
