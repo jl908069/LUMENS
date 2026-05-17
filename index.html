@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Entity/Coreference Annotator</title>
+  <title>Annotator</title>
 
   <!-- Local libraries -->
   <link rel="stylesheet" href="lib/jquery-ui.css">
@@ -39,7 +39,7 @@
           type="button"
           class="btn"
           onclick="group_selected();"
-          title="Group selected spans: select spans, switch to coref colors, then press Enter"
+          title="Group selected spans: click spans, switch to coref colors, then hit Group"
           id="btn_group">
           <i class="fa fa-object-group"></i>
         </button>
@@ -48,7 +48,7 @@
           type="button"
           class="btn"
           onclick="ungroup_selected();"
-          title="Ungroup selected spans: select spans, then press Delete"
+          title="Ungroup selected spans: click spans, switch to coref colors,  then hit Ungroup"
           id="btn_ungroup">
           <i class="fa fa-object-ungroup"></i>
         </button>
@@ -65,7 +65,7 @@
           type="button"
           class="btn"
           onclick="return show_import();"
-          title="Import entity/coreference TSV">
+          title="Import TSV">
           <span class="fa-stack fa-1x">
             <i class="fa fa-file-o fa-stack-1x"></i>
             <i class="fa fa-arrow-right fa-stack-1x import-arrow"></i>
@@ -76,7 +76,7 @@
           type="button"
           class="btn"
           onclick="return show_export();"
-          title="Export entity/coreference TSV">
+          title="Export TSV">
           <span class="fa-stack fa-1x">
             <i class="fa fa-file-o fa-stack-1x"></i>
             <i class="fa fa-arrow-right fa-stack-1x export-arrow"></i>
@@ -103,11 +103,11 @@
   <!-- Import dialog -->
   <div id="import_dialog" class="dialog" style="display:none;">
     <p>
-      <strong>Import entity/coreference TSV</strong>
+      <strong>Import TSV</strong>
     </p>
 
     <p class="dialog-help">
-      Choose one entity/coreference TSV file. The page will automatically load the matching
+      Choose one TSV file under the Annotation folder. The page will automatically load the matching
       token TSV from the <code>tokens/</code> folder.
     </p>
 
@@ -118,9 +118,9 @@
 
     <input type="file" id="import_coref_file" accept=".tsv,.txt">
 
-    <div class="paste-fallback">
+    <!-- <div class="paste-fallback">
       <p>
-        <strong>Optional paste fallback</strong>
+        <strong>Optional paste option</strong>
       </p>
 
       <p class="dialog-help">
@@ -131,12 +131,12 @@
 
       <textarea id="import_coref_textarea"></textarea>
     </div>
-  </div>
+  </div> -->
 
   <!-- Export dialog -->
   <div id="export_dialog" class="dialog" style="display:none;">
     <p>
-      <strong>Export entity/coreference TSV</strong>
+      <strong>Export TSV</strong>
     </p>
 
     <p class="dialog-help">
