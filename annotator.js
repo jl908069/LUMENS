@@ -1653,6 +1653,23 @@ function run_export() {
    Optional entity dialog
    ============================================================= */
 
+/* =============================================================
+   Entity type dialog
+   ============================================================= */
+
+const LUMENS_ENTITY_TYPES = [
+  'CHARACTER',
+  'GROUP',
+  'LOCATION',
+  'OBJECT',
+  'ABSTRACT',
+  'EVENT',
+  'TIME',
+  'ANIMAL',
+  'DEITY',
+  'ORGANIZATION'
+];
+
 function show_annotation(e) {
   const id = $(this).attr('id');
 
@@ -1663,7 +1680,6 @@ function show_annotation(e) {
   if (!ent) return;
 
   const $dlg = $('#annotation_dialog');
-
   if (!$dlg.length) return;
 
   $('#anno_entity_text').html(escHTML(ent.get_text()));
@@ -1672,17 +1688,52 @@ function show_annotation(e) {
     <option value="lumens_entity_type">lumens_entity_type</option>
   `);
 
-  $('#sel_anno_value').html('');
+  let options = '';
+
+  LUMENS_ENTITY_TYPES.forEach(type => {
+    const selected = type === ent.type ? ' selected' : '';
+    options += `<option value="${escHTML(type)}"${selected}>${escHTML(type)}</option>`;
+  });
+
+  $('#sel_anno_value').html(options);
+  $('#sel_anno_value').val(ent.type);
 
   $dlg.dialog('open');
   $('span.ui-dialog-title').text('Entity: ' + ent.type);
 
-  e.stopPropagation();
+  if (e) e.stopPropagation();
 }
 
-function select_anno_key() {}
+function select_anno_key() {
+  const did = $('#active_entity').val();
+  if (!did || !(did in entities)) return;
 
-function select_anno_value() {}
+  const ent = entities[did];
+
+  let options = '';
+
+  LUMENS_ENTITY_TYPES.forEach(type => {
+    const selected = type === ent.type ? ' selected' : '';
+    options += `<option value="${escHTML(type)}"${selected}>${escHTML(type)}</option>`;
+  });
+
+  $('#sel_anno_value').html(options);
+  $('#sel_anno_value').val(ent.type);
+}
+
+function select_anno_value() {
+  const did = $('#active_entity').val();
+  if (!did || !(did in entities)) return;
+
+  const newType = $('#sel_anno_value').val();
+  if (!newType) return;
+
+  $('#active_entity').val(did);
+  change_entity(newType);
+
+  $('span.ui-dialog-title').text('Entity: ' + newType);
+}
+
 
 
 /* =============================================================
