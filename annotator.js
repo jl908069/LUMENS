@@ -385,6 +385,77 @@ function init_summary_panel() {
   });
 }
 
+const SUMMARY_SLOTS = ['25 words', '50 words', '100 words'];
+
+function normalizeSummarySlot(label, fallbackNumber = null) {
+  const clean = String(label || '')
+    .toLowerCase()
+    .replace(/[()]/g, '')
+    .replace(/summary/g, '')
+    .trim();
+
+  if (clean.includes('25')) return '25 words';
+  if (clean.includes('50')) return '50 words';
+  if (clean.includes('100')) return '100 words';
+
+  // Fallback for imported files with #Summary1, #Summary2, #Summary3
+  if (fallbackNumber === 1) return '25 words';
+  if (fallbackNumber === 2) return '50 words';
+  if (fallbackNumber === 3) return '100 words';
+
+  return null;
+}
+
+function parse_summaries_from_tsv(raw) {
+  // Reset summary fields first
+  summaries = {
+    '25 words': '',
+    '50 words': '',
+    '100 words': ''
+  };
+
+  const lines = String(raw || '').replace(/\r\n/g, '\n').split('\n');
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+
+    // Accept:
+    // #Summary1=(25 words summary) ...
+    // # Summary3=(100 words summary) ...
+    const match = trimmed.match(/^#\s*Summary\s*(\d+)\s*=\s*\((.*?)\)\s*(.*)$/i);
+
+    if (!match) continue;
+
+    const summaryNumber = parseInt(match[1], 10);
+    const label = match[2];
+    const text = match[3] || '';
+
+    const slot = normalizeSummarySlot(label, summaryNumber);
+
+    if (slot) {
+      summaries[slot] = text.trim();
+    }
+  }
+
+  init_summary_panel();
+}
+
+function make_summary_header_lines() {
+  const labels = {
+    '25 words': '25 words summary',
+    '50 words': '50 words summary',
+    '100 words': '100 words summary'
+  };
+
+  return SUMMARY_SLOTS.map((slot, idx) => {
+    const cleanSummary = String(summaries[slot] || '')
+      .replace(/\r?\n/g, ' ')
+      .trim();
+
+    return `#Summary${idx + 1}=(${labels[slot]}) ${cleanSummary}`;
+  });
+}
+
 function open_summary(id) {
   $('#' + id).slideDown(150).focus();
   $('#act-' + id).slideDown(150);
@@ -1476,6 +1547,7 @@ function read_coref_tsv(raw) {
     alert('The matching token TSV could not be loaded, so the entity TSV cannot be imported.');
     return;
   }
+  parse_summaries_from_tsv(raw);
 
   reset_annotations_only();
 
@@ -1611,6 +1683,9 @@ function show_import() {
 
 function write_coref_tsv() {
   const rows = [];
+
+  // Save summaries at the top of the TSV
+  rows.push(...make_summary_header_lines());
 
   rows.push([
     'COREF',
