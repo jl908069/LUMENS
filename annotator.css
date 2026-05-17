@@ -1,0 +1,457 @@
+/* =============================================================
+   Entity/Coreference Annotator CSS
+   Based on the original spannotator CSS, with additions for:
+   - summary slots
+   - one-file import dialog
+   - review-flag badge
+   - GitHub Pages-friendly standalone layout
+   ============================================================= */
+
+
+/* -----------------------------
+   Token selection
+   ----------------------------- */
+
+#selectable .ui-selecting {
+  background: #FECA40;
+}
+
+#selectable .ui-selected {
+  background: #F39814;
+  color: white;
+}
+
+#selectable {
+  display: inline-table;
+  counter-reset: sent;
+}
+
+#selectable div {
+}
+
+
+/* -----------------------------
+   Page layout
+   ----------------------------- */
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 15px;
+  background: white;
+  color: #222;
+}
+
+#spannotator {
+  width: 100%;
+}
+
+#editor {
+  border: 1px solid black;
+  margin-right: 5px;
+  margin-left: 25px;
+  width: 95%;
+  top: 38px;
+  position: relative;
+  min-height: 200px;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+
+/* -----------------------------
+   Toolbar
+   ----------------------------- */
+
+#toolbar {
+  background-color: navy;
+  width: 100%;
+  position: fixed;
+  margin-right: 5px;
+  margin-left: -5px;
+  margin-bottom: 20px;
+  z-index: 100;
+  top: 0;
+  min-height: 40px;
+}
+
+.toolbar-inner {
+  padding-left: 8px;
+  white-space: nowrap;
+}
+
+#toolbar button {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: #a9aead;
+  color: #454545;
+  text-align: center;
+  z-index: 1;
+  padding: 2px 0;
+  margin: 5px 1px;
+  border: none;
+  cursor: pointer;
+}
+
+#toolbar button:disabled {
+  background-color: #6f6f6f;
+  color: #928f8f;
+  cursor: default;
+}
+
+#toolbar button:hover:enabled {
+  background-color: #b4d6df;
+}
+
+.toolbar-label {
+  color: white;
+  margin-left: 8px;
+}
+
+#color_mode {
+  margin-left: 4px;
+  height: 24px;
+}
+
+.import-arrow {
+  text-indent: -7px;
+  font-size: smaller;
+}
+
+.export-arrow {
+  text-indent: 7px;
+  font-size: smaller;
+}
+
+
+/* -----------------------------
+   Summary panel
+   ----------------------------- */
+
+#summary-panel {
+  margin: 55px 25px 10px 25px;
+  width: 95%;
+  box-sizing: border-box;
+}
+
+.summary-card {
+  border: 1px solid #cfcfcf;
+  border-radius: 5px;
+  background: #fafafa;
+  margin-bottom: 8px;
+  padding: 8px;
+}
+
+.summary-label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.sum-icon {
+  color: #555;
+  margin-right: 4px;
+}
+
+.sum-title {
+  margin-right: 6px;
+}
+
+.summary-preview {
+  min-height: 24px;
+  border: 1px dashed #c7c7c7;
+  background: white;
+  padding: 6px;
+  cursor: pointer;
+  line-height: 1.4;
+}
+
+.summary-preview:hover {
+  background: #f4f8ff;
+}
+
+.summary-placeholder {
+  color: #888;
+  font-style: italic;
+}
+
+.sum-text-preview {
+  color: #222;
+}
+
+.summary-textarea {
+  width: 98%;
+  min-height: 85px;
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  padding: 6px;
+}
+
+.summary-actions {
+  margin-top: 6px;
+}
+
+.summary-actions button {
+  margin-right: 5px;
+}
+
+
+/* -----------------------------
+   Entity boxes
+   ----------------------------- */
+
+.entity {
+  border: 2px solid red;
+  display: inline-block;
+  margin: 1px;
+  position: relative;
+  border-radius: 3px;
+  background: transparent;
+}
+
+.selected-entity {
+  background-color: #b2f4fd !important;
+}
+
+.entity-border-hover-right {
+  border-right: 2px dashed black;
+  cursor: e-resize;
+}
+
+.entity-border-hover-left {
+  border-left: 2px dashed black;
+  cursor: e-resize;
+}
+
+.entity_type {
+  font-size: x-small;
+  color: grey;
+  position: relative;
+  vertical-align: top;
+  display: inline-block;
+  left: 0;
+  top: 0;
+}
+
+.entity_icon {
+  margin: 0 2px;
+}
+
+.close {
+  font-size: x-small;
+  color: grey;
+  margin: 1px;
+  text-align: right;
+  vertical-align: top;
+  display: inline;
+  cursor: pointer;
+}
+
+.close:hover {
+  color: #222;
+}
+
+
+/* Optional review flag badge */
+.review-flag {
+  position: absolute;
+  top: -8px;
+  right: -6px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #f5c542;
+  color: #222;
+  font-size: 11px;
+  font-weight: bold;
+  line-height: 14px;
+  text-align: center;
+  z-index: 5;
+  border: 1px solid #a87900;
+}
+
+
+/* -----------------------------
+   Tokens
+   ----------------------------- */
+
+.tok {
+  display: inline-block;
+  padding: 2px;
+  cursor: pointer;
+}
+
+.tok:hover {
+  background: #e9f3ff;
+}
+
+
+/* -----------------------------
+   Entity type dropdown
+   ----------------------------- */
+
+.custom-menu {
+  display: none;
+  z-index: 1000;
+  position: absolute;
+  overflow: hidden;
+  border: 1px solid #CCC;
+  white-space: nowrap;
+  font-family: sans-serif;
+  background: #FFF;
+  color: #333;
+  border-radius: 5px;
+  padding: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+
+.custom-menu li {
+  padding: 8px 12px;
+  cursor: pointer;
+  list-style-type: none;
+  transition: all .3s ease;
+  user-select: none;
+}
+
+.custom-menu li:hover {
+  background-color: #DEF;
+}
+
+
+/* -----------------------------
+   Sentence view
+   ----------------------------- */
+
+.numbered:after {
+  counter-increment: sent;
+  content: counter(sent);
+}
+
+.offset {
+  position: relative;
+  left: -40px;
+  margin-right: -15px;
+}
+
+.sent_row {
+  padding: 12px;
+  vertical-align: middle;
+}
+
+#selectable .sent_row:nth-of-type(even) {
+  background: #e0e0e0;
+}
+
+
+/* -----------------------------
+   Dialogs
+   ----------------------------- */
+
+.dialog {
+  font-size: 14px;
+}
+
+.dialog textarea {
+  width: 100%;
+  height: 220px;
+  box-sizing: border-box;
+  font-family: Menlo, Consolas, monospace;
+  font-size: 13px;
+  padding: 6px;
+}
+
+.dialog-help {
+  color: #444;
+  line-height: 1.4;
+}
+
+.dialog code {
+  background: #f1f1f1;
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+#import_coref_file {
+  display: block;
+  margin: 10px 0 16px 0;
+}
+
+.paste-fallback {
+  border-top: 1px solid #ddd;
+  margin-top: 14px;
+  padding-top: 10px;
+}
+
+#import_coref_textarea {
+  height: 130px;
+}
+
+#export_dialog textarea {
+  height: 340px;
+}
+
+#anno_entity_text {
+  border: 1px solid gray;
+  margin: 4px 0 10px 0;
+  padding: 4px;
+  color: gray;
+  font-style: italic;
+}
+
+
+/* -----------------------------
+   Loading screen
+   ----------------------------- */
+
+#loading_screen {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  display: none;
+  left: 0;
+  top: 0;
+  z-index: 200;
+  padding-top: 100px;
+  text-align: center;
+}
+
+.loading {
+  display: block !important;
+  background-color: gray;
+  overflow: hidden;
+}
+
+.loading i {
+  display: block !important;
+}
+
+
+/* -----------------------------
+   Legacy/helper styles
+   ----------------------------- */
+
+.left {
+  content: '';
+  width: 3px;
+  padding: 0;
+  display: inline;
+  border-right: 3px dashed transparent;
+}
+
+.right {
+  content: '';
+  padding: 0;
+  display: inline;
+  border-left: 3px dashed transparent;
+}
+
+.highlight-star {
+  position: absolute;
+  top: 11px;
+  left: 0;
+  color: yellow;
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: orange;
+  display: none;
+}
