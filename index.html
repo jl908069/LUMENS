@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Entity/Coreference Annotator</title>
+
+  <!-- Local libraries -->
+  <link rel="stylesheet" href="lib/jquery-ui.css">
+  <link rel="stylesheet" href="lib/font-awesome-4.7.0/css/font-awesome.min.css">
+
+  <!-- Annotator styles -->
+  <link rel="stylesheet" href="annotator.css">
+</head>
+
+<body>
+  <input type="hidden" name="active_entity" id="active_entity" value="">
+
+  <ul id="anno-context" class="custom-menu"></ul>
+
+  <div id="spannotator">
+    <div id="loading_screen" class="loading">
+      <i class="fa fa-spinner fa-spin"></i>
+      <br>
+      Loading...
+    </div>
+
+    <div id="toolbar">
+      <div class="toolbar-inner">
+        <button
+          type="button"
+          class="btn"
+          onclick="add_entity();"
+          title="Add span: select tokens, then press Enter">
+          <i class="fa fa-plus"></i>
+        </button>
+
+        <button
+          type="button"
+          class="btn"
+          onclick="group_selected();"
+          title="Group selected spans: select spans, switch to coref colors, then press Enter"
+          id="btn_group">
+          <i class="fa fa-object-group"></i>
+        </button>
+
+        <button
+          type="button"
+          class="btn"
+          onclick="ungroup_selected();"
+          title="Ungroup selected spans: select spans, then press Delete"
+          id="btn_ungroup">
+          <i class="fa fa-object-ungroup"></i>
+        </button>
+
+        <button
+          type="button"
+          class="btn"
+          onclick="toggle_sents();"
+          title="Toggle sentence view">
+          <i class="fa fa-paragraph"></i>
+        </button>
+
+        <button
+          type="button"
+          class="btn"
+          onclick="return show_import();"
+          title="Import entity/coreference TSV">
+          <span class="fa-stack fa-1x">
+            <i class="fa fa-file-o fa-stack-1x"></i>
+            <i class="fa fa-arrow-right fa-stack-1x import-arrow"></i>
+          </span>
+        </button>
+
+        <button
+          type="button"
+          class="btn"
+          onclick="return show_export();"
+          title="Export entity/coreference TSV">
+          <span class="fa-stack fa-1x">
+            <i class="fa fa-file-o fa-stack-1x"></i>
+            <i class="fa fa-arrow-right fa-stack-1x export-arrow"></i>
+          </span>
+        </button>
+
+        <span class="toolbar-label">| use colors for:</span>
+
+        <select id="color_mode" onchange="set_color_mode(this.value);">
+          <option value="entities" selected>entity types</option>
+          <option value="coref">coref</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Three fixed summary slots -->
+    <div id="summary-panel"></div>
+
+    <div id="editor">
+      <div id="selectable"></div>
+    </div>
+  </div>
+
+  <!-- Import dialog -->
+  <div id="import_dialog" class="dialog" style="display:none;">
+    <p>
+      <strong>Import entity/coreference TSV</strong>
+    </p>
+
+    <p class="dialog-help">
+      Choose one entity/coreference TSV file. The page will automatically load the matching
+      token TSV from the <code>tokens/</code> folder.
+    </p>
+
+    <p class="dialog-help">
+      Example: importing <code>mythology.tsv</code> will load
+      <code>tokens/mythology.tokens.tsv</code>.
+    </p>
+
+    <input type="file" id="import_coref_file" accept=".tsv,.txt">
+
+    <div class="paste-fallback">
+      <p>
+        <strong>Optional paste fallback</strong>
+      </p>
+
+      <p class="dialog-help">
+        Pasting works only if the TSV includes a line like
+        <code>#DocID=mythology</code>, so the page can find
+        <code>tokens/mythology.tokens.tsv</code>.
+      </p>
+
+      <textarea id="import_coref_textarea"></textarea>
+    </div>
+  </div>
+
+  <!-- Export dialog -->
+  <div id="export_dialog" class="dialog" style="display:none;">
+    <p>
+      <strong>Export entity/coreference TSV</strong>
+    </p>
+
+    <p class="dialog-help">
+      The exported file contains exactly these columns:
+      <code>COREF</code>, <code>text</code>, <code>start_token</code>,
+      <code>end_token</code>, <code>lumens_entity_type</code>.
+    </p>
+
+    <textarea></textarea>
+  </div>
+
+  <!-- Minimal annotation dialog, currently used only for viewing entity text -->
+  <div id="annotation_dialog" class="dialog" style="display:none;">
+    <p>
+      <div id="anno_entity_text"></div>
+      <select id="sel_anno_key" onchange="select_anno_key();"></select>
+      <select id="sel_anno_value" onchange="select_anno_value();"></select>
+    </p>
+  </div>
+
+  <!-- Scripts should be loaded after HTML elements are present -->
+  <script src="lib/jquery-3.5.1.min.js"></script>
+  <script src="lib/jquery-ui.js"></script>
+  <script src="annotator.js"></script>
+</body>
+</html>
