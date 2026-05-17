@@ -294,8 +294,8 @@ let nextManualCorefId = 0;
 let activeEntityId = null;
 
 let summaries = {
-  '50 words': '',
   '100 words': '',
+  '50 words': '',
   '25 words': ''
 };
 
@@ -348,7 +348,7 @@ function init_summary_panel() {
 
   $p.empty();
 
-  ['50 words', '100 words', '25 words'].forEach(slot => {
+  ['100 words', '50 words', '25 words'].forEach(slot => {
     const val = summaries[slot] || '';
     const sid = 'sum-' + slot.replace(/\s/g, '-');
 
@@ -1849,7 +1849,7 @@ $(document).ready(function() {
       width: 620,
       height: 420,
       modal: true,
-      title: 'Import COREF/entity TSV',
+      title: 'Import TSV',
       buttons: {
         'Load': function() {
           run_import();
@@ -1868,7 +1868,7 @@ $(document).ready(function() {
       width: 520,
       height: 500,
       modal: true,
-      title: 'Export COREF/entity TSV',
+      title: 'Export TSV',
       buttons: {
         'Close': function() {
           $(this).dialog('close');
