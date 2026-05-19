@@ -305,10 +305,11 @@ let summaries = {
    ============================================================= */
 
 class Entity {
-  constructor(tok_ids, type, has_flag = false, originalCoref = null) {
+  constructor(tok_ids, type, has_flag = false, originalCoref = null, isInSummary = '') {
     this.type = type || DEFAULT_ENTITY_TYPE;
     this.has_flag = !!has_flag;
     this.originalCoref = originalCoref;
+    this.isInSummary = normalizeSummaryMatchValue(isInSummary);
 
     this.toks = tok_ids.map(Number).sort((a, b) => a - b);
     this.start = Math.min(...this.toks);
@@ -386,6 +387,26 @@ function init_summary_panel() {
 }
 
 const SUMMARY_SLOTS = ['25 words', '50 words', '100 words'];
+
+const SUMMARY_MATCH_OPTIONS = [
+  '25 words summary',
+  '50 words summary',
+  '100 words summary'
+];
+
+function normalizeSummaryMatchValue(value) {
+  const v = String(value || '').trim().toLowerCase();
+
+  if (!v || v === '_' || v === 'none' || v === 'null' || v === 'false') {
+    return '';
+  }
+
+  if (v.includes('25')) return '25 words summary';
+  if (v.includes('50')) return '50 words summary';
+  if (v.includes('100')) return '100 words summary';
+
+  return '';
+}
 
 function normalizeSummarySlot(label, fallbackNumber = null) {
   const clean = String(label || '')
@@ -1163,7 +1184,7 @@ function get_maximal_covers(tok_ids) {
   return Array.from(covers);
 }
 
-function add_entity(tok_ids = null, entity_type = null, batch = false, has_flag = false, originalCoref = null) {
+function add_entity(tok_ids = null, entity_type = null, batch = false, has_flag = false, originalCoref = null, isInSummary = '') {
   if (!tok_ids) {
     tok_ids = [];
 
@@ -1196,7 +1217,8 @@ function add_entity(tok_ids = null, entity_type = null, batch = false, has_flag 
     tok_ids,
     entity_type || DEFAULT_ENTITY_TYPE,
     has_flag,
-    originalCoref
+    originalCoref,
+    isInSummary
   );
 
   const covering = get_maximal_covers(tok_ids);
@@ -1560,7 +1582,7 @@ function read_coref_tsv(raw) {
     return;
   }
 
-  let iCoref, iText, iStart, iEnd, iType, iFlags;
+  let iCoref, iText, iStart, iEnd, iType, iFlags, iSummaryMatch;
 
   try {
     iCoref = columnIndex(header, ['COREF', 'coref'], true);
@@ -1569,6 +1591,7 @@ function read_coref_tsv(raw) {
     iEnd = columnIndex(header, ['end_token'], true);
     iType = columnIndex(header, ['lumens_entity_type', 'entity_type', 'type'], true);
     iFlags = columnIndex(header, ['lumens_review_flags', 'review_flags', 'flags'], false);
+    iSummaryMatch = columnIndex(header, ['Is_in_summary', 'is_in_summary', 'summary_match'], false);
   } catch (err) {
     alert(err.message);
     return;
@@ -1587,6 +1610,9 @@ function read_coref_tsv(raw) {
       : '';
 
     const hasFlag = !isEmptyValue(flagsRaw);
+    const isInSummary = iSummaryMatch >= 0
+      ? normalizeSummaryMatchValue(row[iSummaryMatch])
+      : '';
 
     if (isEmptyValue(coref) || Number.isNaN(s0) || Number.isNaN(e0)) {
       errors.push(`row ${idx + 2}: invalid COREF/start_token/end_token`);
@@ -1610,7 +1636,7 @@ function read_coref_tsv(raw) {
       return;
     }
 
-    const ne = add_entity(internalToks, etype, true, hasFlag, coref);
+    const ne = add_entity(internalToks, etype, true, hasFlag, coref, isInSummary);
 
     if (!ne) {
       errors.push(`row ${idx + 2}: could not add span ${s0}-${e0}, possibly duplicate or crossing span`);
@@ -1692,7 +1718,8 @@ function write_coref_tsv() {
     'text',
     'start_token',
     'end_token',
-    'lumens_entity_type'
+    'lumens_entity_type',
+    'Is_in_summary'
   ].join('\t'));
 
   Object.values(entities)
@@ -1707,7 +1734,8 @@ function write_coref_tsv() {
         cleanCell(e.get_text()),
         String(e.start - 1),
         String(e.end - 1),
-        cleanCell(e.type || DEFAULT_ENTITY_TYPE)
+        cleanCell(e.type || DEFAULT_ENTITY_TYPE),
+        cleanCell(e.isInSummary || '')
       ].join('\t'));
     });
 
@@ -1759,19 +1787,46 @@ function show_annotation(e) {
 
   $('#anno_entity_text').html(escHTML(ent.get_text()));
 
-  $('#sel_anno_key').html(`
-    <option value="lumens_entity_type">lumens_entity_type</option>
-  `);
+  const html = `
+    <div class="anno-row">
+      <label for="sel_entity_type"><strong>lumens_entity_type</strong></label><br>
+      <select id="sel_entity_type" onchange="select_entity_type_value();"></select>
+    </div>
 
-  let options = '';
+    <div class="anno-row">
+      <label for="sel_is_in_summary"><strong>Is_in_summary</strong></label><br>
+      <select id="sel_is_in_summary" onchange="select_summary_match_value();"></select>
+    </div>
+  `;
+
+  $('#sel_anno_key').hide();
+  $('#sel_anno_value').hide();
+
+  if (!$('#custom_entity_controls').length) {
+    $('#anno_entity_text').after('<div id="custom_entity_controls"></div>');
+  }
+
+  $('#custom_entity_controls').html(html);
+
+  let typeOptions = '';
 
   LUMENS_ENTITY_TYPES.forEach(type => {
     const selected = type === ent.type ? ' selected' : '';
-    options += `<option value="${escHTML(type)}"${selected}>${escHTML(type)}</option>`;
+    typeOptions += `<option value="${escHTML(type)}"${selected}>${escHTML(type)}</option>`;
   });
 
-  $('#sel_anno_value').html(options);
-  $('#sel_anno_value').val(ent.type);
+  $('#sel_entity_type').html(typeOptions);
+  $('#sel_entity_type').val(ent.type);
+
+  let summaryOptions = '<option value="">None</option>';
+
+  SUMMARY_MATCH_OPTIONS.forEach(opt => {
+    const selected = opt === ent.isInSummary ? ' selected' : '';
+    summaryOptions += `<option value="${escHTML(opt)}"${selected}>${escHTML(opt)}</option>`;
+  });
+
+  $('#sel_is_in_summary').html(summaryOptions);
+  $('#sel_is_in_summary').val(ent.isInSummary || '');
 
   $dlg.dialog('open');
   $('span.ui-dialog-title').text('Entity: ' + ent.type);
@@ -1779,28 +1834,11 @@ function show_annotation(e) {
   if (e) e.stopPropagation();
 }
 
-function select_anno_key() {
+function select_entity_type_value() {
   const did = $('#active_entity').val();
   if (!did || !(did in entities)) return;
 
-  const ent = entities[did];
-
-  let options = '';
-
-  LUMENS_ENTITY_TYPES.forEach(type => {
-    const selected = type === ent.type ? ' selected' : '';
-    options += `<option value="${escHTML(type)}"${selected}>${escHTML(type)}</option>`;
-  });
-
-  $('#sel_anno_value').html(options);
-  $('#sel_anno_value').val(ent.type);
-}
-
-function select_anno_value() {
-  const did = $('#active_entity').val();
-  if (!did || !(did in entities)) return;
-
-  const newType = $('#sel_anno_value').val();
+  const newType = $('#sel_entity_type').val();
   if (!newType) return;
 
   $('#active_entity').val(did);
@@ -1808,6 +1846,18 @@ function select_anno_value() {
 
   $('span.ui-dialog-title').text('Entity: ' + newType);
 }
+
+function select_summary_match_value() {
+  const did = $('#active_entity').val();
+  if (!did || !(did in entities)) return;
+
+  const val = $('#sel_is_in_summary').val();
+  entities[did].isInSummary = normalizeSummaryMatchValue(val);
+}
+
+/* Keep these as no-ops for compatibility with the old HTML. */
+function select_anno_key() {}
+function select_anno_value() {}
 
 
 
