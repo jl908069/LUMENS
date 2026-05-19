@@ -318,6 +318,15 @@ body {
   background-color: #DEF;
 }
 
+.anno-row {
+  margin-bottom: 12px;
+}
+
+.anno-row select {
+  min-width: 230px;
+  margin-top: 4px;
+}
+
 
 /* -----------------------------
    Sentence view
