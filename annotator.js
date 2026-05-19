@@ -1,4 +1,4 @@
-/* =============================================================
+/* =============================================================parseSummaryMatchValues
    COREF/entity annotator for GitHub Pages
 
    Annotator-facing import:
@@ -309,7 +309,7 @@ class Entity {
     this.type = type || DEFAULT_ENTITY_TYPE;
     this.has_flag = !!has_flag;
     this.originalCoref = originalCoref;
-    this.isInSummary = normalizeSummaryMatchValue(isInSummary);
+    this.isInSummary = parseSummaryMatchValues(isInSummary);
 
     this.toks = tok_ids.map(Number).sort((a, b) => a - b);
     this.start = Math.min(...this.toks);
@@ -406,6 +406,22 @@ function normalizeSummaryMatchValue(value) {
   if (v.includes('100')) return '100 words summary';
 
   return '';
+}
+
+function parseSummaryMatchValues(value) {
+  if (!value) return [];
+
+  return String(value)
+    .split(',')
+    .map(v => normalizeSummaryMatchValue(v))
+    .filter(v => v !== '');
+}
+
+function formatSummaryMatchValues(values) {
+  if (!Array.isArray(values)) return '';
+
+  const ordered = SUMMARY_MATCH_OPTIONS.filter(opt => values.includes(opt));
+  return ordered.join(', ');
 }
 
 function normalizeSummarySlot(label, fallbackNumber = null) {
@@ -1611,7 +1627,7 @@ function read_coref_tsv(raw) {
 
     const hasFlag = !isEmptyValue(flagsRaw);
     const isInSummary = iSummaryMatch >= 0
-      ? normalizeSummaryMatchValue(row[iSummaryMatch])
+      ? row[iSummaryMatch]
       : '';
 
     if (isEmptyValue(coref) || Number.isNaN(s0) || Number.isNaN(e0)) {
@@ -1735,7 +1751,7 @@ function write_coref_tsv() {
         String(e.start - 1),
         String(e.end - 1),
         cleanCell(e.type || DEFAULT_ENTITY_TYPE),
-        cleanCell(e.isInSummary || '')
+        formatSummaryMatchValues(e.isInSummary)
       ].join('\t'));
     });
 
@@ -1757,15 +1773,17 @@ function run_export() {
    ============================================================= */
 
 /* =============================================================
-   Entity type dialog
+   Entity dialog:
+   - lumens_entity_type
+   - Is_in_summary, multi-choice
    ============================================================= */
 
 const LUMENS_ENTITY_TYPES = [
-  'CHARACTER',
-  'GROUP',
-  'LOCATION',
-  'OBJECT',
-  'ABSTRACT',
+  'CHARACTER_PERSON',
+  'GROUP_COMMUNITY',
+  'LOCATION_SETTING',
+  'OBJECT_ARTIFACT',
+  'ABSTRACT_CONCEPT',
   'EVENT',
   'TIME',
   'ANIMAL',
@@ -1794,8 +1812,25 @@ function show_annotation(e) {
     </div>
 
     <div class="anno-row">
-      <label for="sel_is_in_summary"><strong>Is_in_summary</strong></label><br>
-      <select id="sel_is_in_summary" onchange="select_summary_match_value();"></select>
+      <label><strong>Is_in_summary</strong></label><br>
+
+      <label class="summary-check">
+        <input type="checkbox" class="summary-match-checkbox" value="25 words summary"
+               onchange="select_summary_match_value();">
+        25 words summary
+      </label>
+
+      <label class="summary-check">
+        <input type="checkbox" class="summary-match-checkbox" value="50 words summary"
+               onchange="select_summary_match_value();">
+        50 words summary
+      </label>
+
+      <label class="summary-check">
+        <input type="checkbox" class="summary-match-checkbox" value="100 words summary"
+               onchange="select_summary_match_value();">
+        100 words summary
+      </label>
     </div>
   `;
 
@@ -1818,15 +1853,11 @@ function show_annotation(e) {
   $('#sel_entity_type').html(typeOptions);
   $('#sel_entity_type').val(ent.type);
 
-  let summaryOptions = '<option value="">None</option>';
+  const selectedSummaries = Array.isArray(ent.isInSummary) ? ent.isInSummary : [];
 
-  SUMMARY_MATCH_OPTIONS.forEach(opt => {
-    const selected = opt === ent.isInSummary ? ' selected' : '';
-    summaryOptions += `<option value="${escHTML(opt)}"${selected}>${escHTML(opt)}</option>`;
+  $('.summary-match-checkbox').each(function() {
+    $(this).prop('checked', selectedSummaries.includes($(this).val()));
   });
-
-  $('#sel_is_in_summary').html(summaryOptions);
-  $('#sel_is_in_summary').val(ent.isInSummary || '');
 
   $dlg.dialog('open');
   $('span.ui-dialog-title').text('Entity: ' + ent.type);
@@ -1851,8 +1882,13 @@ function select_summary_match_value() {
   const did = $('#active_entity').val();
   if (!did || !(did in entities)) return;
 
-  const val = $('#sel_is_in_summary').val();
-  entities[did].isInSummary = normalizeSummaryMatchValue(val);
+  const selected = [];
+
+  $('.summary-match-checkbox:checked').each(function() {
+    selected.push($(this).val());
+  });
+
+  entities[did].isInSummary = selected;
 }
 
 /* Keep these as no-ops for compatibility with the old HTML. */
