@@ -196,6 +196,15 @@ body {
   margin-right: 5px;
 }
 
+.summary-check {
+  display: block;
+  margin-top: 6px;
+}
+
+.summary-check input {
+  margin-right: 6px;
+}
+
 
 /* -----------------------------
    Entity boxes
