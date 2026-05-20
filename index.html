@@ -39,7 +39,7 @@
           type="button"
           class="btn"
           onclick="group_selected();"
-          title="Group selected spans: click spans, switch to coref colors, then hit Group"
+          title="Group selected spans: select spans, switch to coref colors, then hit Group"
           id="btn_group">
           <i class="fa fa-object-group"></i>
         </button>
@@ -48,7 +48,7 @@
           type="button"
           class="btn"
           onclick="ungroup_selected();"
-          title="Ungroup selected spans: click spans, switch to coref colors,  then hit Ungroup"
+          title="Ungroup selected spans: select spans, switch to coref colors, then hit Ungroup"
           id="btn_ungroup">
           <i class="fa fa-object-ungroup"></i>
         </button>
@@ -102,9 +102,9 @@
 
   <!-- Import dialog -->
   <div id="import_dialog" class="dialog" style="display:none;">
-    <p>
+    <!-- <p>
       <strong>Import TSV</strong>
-    </p>
+    </p> -->
 
     <p class="dialog-help">
       Choose one TSV file under the <code>annotations</code> folder. The page will automatically load the matching
@@ -135,15 +135,15 @@
 
   <!-- Export dialog -->
   <div id="export_dialog" class="dialog" style="display:none;">
-    <p>
+    <!-- <p>
       <strong>Export TSV</strong>
-    </p>
+    </p> -->
 
     <!-- <p class="dialog-help">
       The exported file contains exactly these columns:
       <code>COREF</code>, <code>text</code>, <code>start_token</code>,
       <code>end_token</code>, <code>lumens_entity_type</code>.
-    </p> -->
+    </p>  -->
 
     <textarea></textarea>
   </div>
