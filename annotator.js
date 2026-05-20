@@ -229,7 +229,7 @@ function colorFor(type) {
 
 const global_defaults = {
   ANNO_MODE: 'entities',
-  DEFAULT_ENTITY_TYPE: 'CHARACTER_PERSON',
+  DEFAULT_ENTITY_TYPE: 'CHARACTER',
   DEFAULT_ICON: 'question',
   DEFAULT_COLOR: 'lightgray',
   DRAG_TOL: 5,
@@ -758,11 +758,11 @@ function make_context_menu() {
   $menu.html('');
 
   const types = [
-    'CHARACTER_PERSON',
-    'GROUP_COMMUNITY',
-    'LOCATION_SETTING',
-    'OBJECT_ARTIFACT',
-    'ABSTRACT_CONCEPT',
+    'CHARACTER',
+    'GROUP',
+    'LOCATION',
+    'OBJECT',
+    'ABSTRACT',
     'EVENT',
     'TIME',
     'ANIMAL',
@@ -1779,11 +1779,11 @@ function run_export() {
    ============================================================= */
 
 const LUMENS_ENTITY_TYPES = [
-  'CHARACTER_PERSON',
-  'GROUP_COMMUNITY',
-  'LOCATION_SETTING',
-  'OBJECT_ARTIFACT',
-  'ABSTRACT_CONCEPT',
+  'CHARACTER',
+  'GROUP',
+  'LOCATION',
+  'OBJECT',
+  'ABSTRACT',
   'EVENT',
   'TIME',
   'ANIMAL',
@@ -1860,7 +1860,7 @@ function show_annotation(e) {
   });
 
   $dlg.dialog('open');
-  $('span.ui-dialog-title').text('Entity: ' + ent.type);
+  $('#annotation_dialog').dialog('option', 'title', 'Entity: ' + ent.type);
 
   if (e) e.stopPropagation();
 }
@@ -1875,7 +1875,7 @@ function select_entity_type_value() {
   $('#active_entity').val(did);
   change_entity(newType);
 
-  $('span.ui-dialog-title').text('Entity: ' + newType);
+  $('#annotation_dialog').dialog('option', 'title', 'Entity: ' + newType);
 }
 
 function select_summary_match_value() {
